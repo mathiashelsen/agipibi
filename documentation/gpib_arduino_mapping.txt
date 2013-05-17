@@ -1,0 +1,18 @@
+ Arduino pin |  GPIB pin  |  Description
+==================================================
+      22     |      1     | I/O data bit 1
+      23     |      2     | I/O data bit 2 
+      24     |      3     | I/O data bit 3
+      25     |      4     | I/O data bit 4
+      26     |     13     | I/O data bit 5
+      27     |     14     | I/O data bit 6
+      28     |     15     | I/O data bit 7
+      29     |     16     | I/O data bit 8
+      30     |      5     | End Or Identify (EOI)
+      31     |      6     | Data Valid (DAV)
+      32     |      7     | Not Ready For Data (NRFD)
+      33     |      8     | Not Data Accepted (NDAC)
+      34     |      9     | Interface Clear (IFC)
+      35     |     11     | Attention (ATN)
+      36     |     17     | Remote Enable (REN)
+       2     |     10     | Service Request (SRQ)

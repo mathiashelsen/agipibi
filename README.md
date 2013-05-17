@@ -1,7 +1,9 @@
 Agipibi : An Arduino to GPIB Interface
 ======================================
+.. image:: https://raw.github.com/tibal/agipibi/master/documentation/arduino_and_cable.jpg
 
-## DESCRIPTION
+Description
+-----------
 
 Agipibi is a cheap GPIB interface based on the Arduino Mega board or higher
 models. It connects scientific instruments using IEEE 488 buses to a computer,
@@ -9,7 +11,8 @@ or the micro-controller itself if you integrate it in your own code.
 This project goal is to provide the best open source implementation of a GPIB
 controller on prototyping platforms. 
 
-## FEATURES
+Features
+--------
 
   - system controller role
   - act as talker or listener in full address space
@@ -26,7 +29,8 @@ Work-in-progress:
   - more examples for Tektronix scopes
   - bridge to LabVIEW with a Python script (TCP server)
 
-## USAGE
+Usage
+-----
 
 This interface was designed for Arduino Mega 1280, to use other boards you'll
 have to edit the pin mapping at the top of arduino_mega.ino sketch. Be careful
@@ -54,11 +58,13 @@ else:
     print 'Arduino is not responding'
 ```
 
-## AUTHORS
+Authors
+-------
 
   - Thibault VINCENT <tibal@reloaded.fr>
 
-## TRIBUTE
+Thanks
+------
 
 Agipibi was inspired by similar projects:
 

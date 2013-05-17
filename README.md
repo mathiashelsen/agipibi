@@ -1,6 +1,5 @@
 Agipibi : An Arduino to GPIB Interface
 ======================================
-
 !(documentation/arduino_and_cable.jpg?raw=true)
 
 Description

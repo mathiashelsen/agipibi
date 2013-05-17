@@ -31,9 +31,11 @@
 #define NRFD  32  /* GPIB 7  : Not Ready For Data */
 #define NDAC  33  /* GPIB 8  : Not Data Accepted */
 #define IFC   34  /* GPIB 9  : Interface Clear */
-#define SRQ   35  /* GPIB 10 : Service Request */
-#define ATN   36  /* GPIB 11 : Attention */
-#define REN   37  /* GPIB 17 : Remote Enable */
+#define ATN   35  /* GPIB 11 : Attention */
+#define REN   36  /* GPIB 17 : Remote Enable */
+#define SRQ    2  /* GPIB 10 : Service Request
+                     This Arduino pin must have interrupt */
+#define SRQ_i  0  /* Interrupt number for the SRQ pin (see Arduino doc) */
 #define LED   13  /* Busy signal (board is waiting), 13 is the on-board LED */
 
 /* serial commands */
@@ -55,10 +57,13 @@
 #define IN_READ       0x0e
 #define IN_WRITE      0x0f
 #define IN_CMD        0x10
+#define IN_ENGAGE_REQ 0x11
 /* ~ to computer ~ */
 #define OUT_PONG      0x00
 #define OUT_CHUNK     0x01
 #define OUT_STRING    0x02
+#define OUT_REQUEST   0x03
+#define OUT_TIMEOUT   0x04
 /* ~ flags ~ */
 #define FLG_BOOLEAN   0x01
 
@@ -116,6 +121,8 @@ byte talker_address = 0x00;
 boolean talker_is_set = false;
 byte listeners[31];
 byte listener_count = 0;
+boolean int_srq_engaged = false;
+boolean int_dat_engaged = false;
 
 /* misc */
 #define BUFFER_SIZE 255
@@ -134,7 +141,9 @@ void loop() {
   byte cmd, arg, buf[BUFFER_SIZE];
   
   while (true) {
+    int_pause(false);
     if (Serial.available() > 0) {
+      int_pause(true);
       /* read a command */
       cmd = Serial.read();
       /* process command */
@@ -258,10 +267,15 @@ void loop() {
           }
           break;
         
-        /* CMD : send a GPIB command */
+        /* send a GPIB command */
         case IN_CMD:
           while (Serial.available() < 1) {;}
           gpib_cmd(Serial.read());
+          break;
+
+        /* re-engage SRQ interruption reporting */
+        case IN_ENGAGE_REQ:
+          int_set_srq(has_flag(cmd, FLG_BOOLEAN));
           break;
       }
     }
@@ -305,6 +319,43 @@ boolean _listeners_remove(byte address) {
 /* toggle on-board busy LED */
 void _led_busy(boolean state) {
     digitalWrite(LED, state);
+}
+
+/* pause/resume interrupts */
+void int_pause(boolean state) {
+  /* pause */
+  if (state) {
+    /* SRQ */
+    if (int_srq_engaged) {
+      detachInterrupt(SRQ_i);
+    }
+  }
+  /* resume */
+  else {
+    /* SRQ */
+    if (int_srq_engaged) {
+      int_set_srq(true);
+    }
+  }
+}
+
+/* engage/disengage SRQ interruption */
+void int_set_srq(boolean state) {
+  int_srq_engaged = state;
+  pinMode(SRQ, INPUT_PULLUP);
+  if (state) {
+    attachInterrupt(SRQ_i, _int_cb_srq, LOW);
+  } else {
+    detachInterrupt(SRQ_i);
+  }
+}
+
+/* callback to handle SRQ interruption */
+void _int_cb_srq() {
+  /* disable the interruption */
+  int_set_srq(false);
+  /* signal the event */
+  Serial.write(OUT_REQUEST);
 }
 
 /* init GPIB bus lines */

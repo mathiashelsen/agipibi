@@ -43,11 +43,13 @@ class Agipibi(Arduino):
         'READ'      : 0x0e,
         'WRITE'     : 0x0f,
         'CMD'       : 0x10,
+        'ENGAGE_REQ': 0x11,
     }
     CMD_IN = {
         'PONG'      : 0x00,
         'CHUNK'     : 0x01,
         'STRING'    : 0x02,
+        'REQUEST'   : 0x03,
     }
     FLAGS = {
         'BOOLEAN'   : 0x1,

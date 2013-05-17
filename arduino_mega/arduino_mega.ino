@@ -34,6 +34,7 @@
 #define SRQ   35  /* GPIB 10 : Service Request */
 #define ATN   36  /* GPIB 11 : Attention */
 #define REN   37  /* GPIB 17 : Remote Enable */
+#define LED   13  /* Busy signal (board is waiting), 13 is the on-board LED */
 
 /* serial commands */
 /* ~ from computer ~ */
@@ -108,7 +109,7 @@
 
 /* talker/listener state machine */
 /* WARNING: these are not configuration variables, you must use
-            serial commands to adjust parameters */
+   !!!!!!!  serial commands to adjust parameters */
 byte self_address = 0x00;
 boolean self_is_listener = false;
 byte talker_address = 0x00;
@@ -123,6 +124,7 @@ byte listener_count = 0;
 void setup() {
   Serial.begin(115200);
   gpib_bus_init(false);
+  pinMode(LED, OUTPUT);  /* internal LED */
 }
 
 /* Arduino main loop */
@@ -300,6 +302,11 @@ boolean _listeners_remove(byte address) {
   return found;
 }
 
+/* toggle on-board busy LED */
+void _led_busy(boolean state) {
+    digitalWrite(LED, state);
+}
+
 /* init GPIB bus lines */
 void gpib_bus_init(boolean lock) {
   set_bit(NRFD);
@@ -446,6 +453,8 @@ void _gpib_write(byte data, boolean is_command, boolean is_end) {
   clear_bit(EOI);
   clear_bit(DAV);
   clear_bit(NRFD);
+  /* FIXME timeout */
+  _led_busy(true);
   /* wait for consistency, one instrument to initiate reading sequence */
   wait_set(NDAC);
   /* wait for *all* listening instruments readiness */
@@ -460,6 +469,8 @@ void _gpib_write(byte data, boolean is_command, boolean is_end) {
   set_bit(DAV);
   /* wait for *all* listeners to complete read */
   wait_clear(NDAC);
+  /* FIXME timeout */
+  _led_busy(false);
   /* bus data not valid anymore */
   clear_bit(DAV);
   /* reset data lines */
@@ -482,6 +493,8 @@ boolean gpib_read(byte* b) {
   /* handshake : we're ready to receive data */
   set_bit(NDAC);
   clear_bit(NRFD);
+  /* FIXME timeout */
+  _led_busy(true);
   /* wait for valid data */
   wait_set(DAV);
   /* handshake : not ready for a new read */
@@ -494,6 +507,8 @@ boolean gpib_read(byte* b) {
   clear_bit(NDAC);
   /* wait for data release */
   wait_clear(DAV);
+  /* FIXME timeout */
+  _led_busy(false);
   /* handshake : get ready for next byte */
   set_bit(NDAC);
   return eoi;

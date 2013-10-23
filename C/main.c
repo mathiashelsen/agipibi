@@ -15,6 +15,9 @@
  *
  */ 
 
+/*
+ * This is an example program to use a HP 3478A multimeter to read out DC current.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>

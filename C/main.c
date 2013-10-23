@@ -28,7 +28,7 @@
 
 int main(int argc, char **argv)
 {
-    gpibio *gpib = gpib_init( 0x00, 0x01, "/dev/ttyACM0");
+    gpibio *gpib = gpib_init( 0x00, 0x01, "/dev/bus/usb/002/046");
     if( gpib == NULL )
     {
 	printf("Error opening port\n");

@@ -80,24 +80,43 @@ typedef struct
 } gpibio;
 
 /* Low level Arduino stuff */
+
+// Initializes a file descriptor to the Arduino running the HPIB interface
 port * arduino_init(const char *device);
+// Closes the file descriptor
 int arduino_close(port *arduino);
-
+// Reads exactly "size" bytes from the Arduino into the buffer
+// Returns the number of bytes read, asserts if it fails
 int arduino_read(port *arduino, int size, char *buffer);
+// Reads a command and possible flags from the Arduino
 int arduino_read_command(port *arduino, int *command, int *flags);
+// Reads from the Arduino until a \r or \n is found
 int arduino_read_line(port *arduino, int size, char *buffer);
-
+// Writes "size" bytes from "buffer" to the Arduino
 int arduino_write(port *arduino, int size, char *buffer);
+// Writes a command and possible flag to the Arduino
 int arduino_write_command(port *arduino, int command, int flags);
 
 /* Higher level GPIB/HPIB interface */
+/* 
+ * Always call this function first, initializes the Arduino and GPIB interface
+ * Set the address of the Arduino and if it's a controller. Returns a pointer
+ * to the allocated gpib struct, NULL in case of failure
+ */
 gpibio * gpib_init(int address, int controller, const char *device);
+/*
+ * Closes the GPIB interface
+ */ 
 int gpib_close(gpibio *self);
 
 /* Basic functionallity */
+// Pings the Arduino, returns true if success, false (0) if failed
 int gpib_ping(gpibio *self);
+// Prints the status of the GPIB interface
 int gpib_status(gpibio *self);
+// Reads from the GPIB, maximum "size" bytes into "buffer"
 int gpib_read(gpibio *self, int size, char *buffer);
+// Writes "size" bytes from buffer to the GPIB
 int gpib_write(gpibio *self, int size, char *buffer);
 
 /* Advanced func, wrappers */

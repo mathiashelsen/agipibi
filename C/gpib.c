@@ -18,6 +18,7 @@
  */ 
 
 #include "gpib.h"
+
 gpibio * gpib_init(int address, int controller, const char *device)
 {
     gpibio *self = NULL;
@@ -232,15 +233,20 @@ int arduino_read(port *arduino, int size, char *buffer)
     int readsize = 0;
     while( readsize != size)
     {
+	// Try to read as many bytes as possible
 	int retval = read( arduino->fd, buffer+readsize, (size_t) ( size-readsize ) );
 	if( retval < 0 )
 	{
+	    // In case something went wrong, it makes no sense to continue operation
 	    printf("%s\n", strerror(errno) );
 	    assert(retval >= 0);
 	}
+	// Increase the number of bytes read
 	readsize += retval;
     }
+    // Make sure the number of bytes read checks out (redundant!)
     assert( readsize == size );
+    // Return the number of bytes read
     return readsize;
 }
 
@@ -276,19 +282,24 @@ int arduino_read_line(port *arduino, int size, char *buffer)
 }
 
 int arduino_write(port *arduino, int size, char *buffer)
-{
+{   
+    // This will keep track of how many bytes have been written
     int writesize = 0;
     while(size != writesize)
     {
+	// Try to write as many bytes as possible
 	int retval = write(arduino->fd, buffer+writesize, (size_t)( size-writesize));
 	if( retval < 0 )
 	{
+	    // If we couldn't write anything, crash
 	    printf("%s\n", strerror(errno));
 	    assert(retval >= 0);
 	}
+	// Increase the number of bytes read
 	writesize += retval; 
     }
     assert( writesize == size );
+    // Return the number of bytes read from the Arduino
     return writesize;
 }
 

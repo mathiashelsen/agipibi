@@ -81,16 +81,7 @@ int gpib_read(gpibio *self, int size, char *buffer)
     int ret;
     int command = 0, flags = 0;
     ret = arduino_write_command( self->arduino, READ, 0 );
-    if( ret <= 0 )
-    {
-	return ret;
-    }
-
     ret = arduino_read_command( self->arduino, &command, &flags );
-    if( ret <= 0 )
-    {
-	return ret;
-    }
 
     if( command == STRING )
     {
@@ -101,39 +92,15 @@ int gpib_read(gpibio *self, int size, char *buffer)
     {
 	char s = 0, offset = 0;
 	ret = arduino_read( self->arduino, 1, &s );
-	if( ret <= 0 )
-	{
-	    return ret;
-	}
 	ret = arduino_read( self->arduino, s, &(buffer[(int)offset]) );
-	if( ret <= 0 )
-	{
-	    return ret;
-	}
 	offset += s;
 	if( flags != BOOLEAN )
 	{
 	    do{
 		ret = arduino_write_command( self->arduino, READ, 0 );
-		if( ret <= 0 )
-		{
-		    return ret;
-		}
 		ret = arduino_read_command( self->arduino, &command, &flags );
-		if( ret <= 0 )
-		{
-		    return ret;
-		}
 		ret = arduino_read( self->arduino, 1, &s );
-		if( ret <= 0 )
-		{
-		    return ret;
-		}
 		ret = arduino_read( self->arduino, s, &(buffer[(int)offset]) );
-		if( ret <= 0 )
-		{
-		    return ret;
-		}
 		offset += s;
 	    }while( flags != BOOLEAN && command == CHUNK );
 	}
@@ -153,31 +120,15 @@ int gpib_write(gpibio *self, int size, char *buffer)
 	if( s == 255 )
 	{
 	    ret = arduino_write_command( self->arduino, WRITE, 0);
-	    if( ret <= 0 )
-	    {
-		return ret;
-	    }
 	}
 	else
 	{
 	    ret = arduino_write_command( self->arduino, WRITE, BOOLEAN );
-	    if( ret <= 0 )
-	    {
-		return ret;
-	    }
 	}
 	char tmp = (char) s;
 	ret = arduino_write( self->arduino, 1, &tmp );
-	if( ret <= 0 )
-	{
-	    return ret;
-	}
 
 	ret = arduino_write( self->arduino, s, buffer+offset );
-	if( ret <= 0 )
-	{
-	    return ret;
-	}
     }
     return ret;
 }

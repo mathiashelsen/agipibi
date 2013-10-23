@@ -244,8 +244,6 @@ int arduino_read(port *arduino, int size, char *buffer)
 	// Increase the number of bytes read
 	readsize += retval;
     }
-    // Make sure the number of bytes read checks out (redundant!)
-    assert( readsize == size );
     // Return the number of bytes read
     return readsize;
 }
@@ -298,7 +296,6 @@ int arduino_write(port *arduino, int size, char *buffer)
 	// Increase the number of bytes read
 	writesize += retval; 
     }
-    assert( writesize == size );
     // Return the number of bytes read from the Arduino
     return writesize;
 }

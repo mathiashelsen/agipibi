@@ -62,6 +62,7 @@ Authors
 -------
 
   - Thibault VINCENT <tibal@reloaded.fr>
+  - Mathias Helsen <helsen.mathias@gmail.com>
 
 Thanks
 ------

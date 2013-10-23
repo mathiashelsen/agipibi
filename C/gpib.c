@@ -94,15 +94,14 @@ int gpib_read(gpibio *self, int size, char *buffer)
 	ret = arduino_read( self->arduino, 1, &s );
 	ret = arduino_read( self->arduino, s, &(buffer[(int)offset]) );
 	offset += s;
-	if( flags != BOOLEAN )
+	
+	while( flags != BOOLEAN && command == CHUNK )
 	{
-	    do{
-		ret = arduino_write_command( self->arduino, READ, 0 );
-		ret = arduino_read_command( self->arduino, &command, &flags );
-		ret = arduino_read( self->arduino, 1, &s );
-		ret = arduino_read( self->arduino, s, &(buffer[(int)offset]) );
-		offset += s;
-	    }while( flags != BOOLEAN && command == CHUNK );
+	    ret = arduino_write_command( self->arduino, READ, 0 );
+	    ret = arduino_read_command( self->arduino, &command, &flags );
+	    ret = arduino_read( self->arduino, 1, &s );
+	    ret = arduino_read( self->arduino, s, &(buffer[(int)offset]) );
+	    offset += s;
 	}
 	return (int)(offset + s);	
     }
